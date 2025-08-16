@@ -1,4 +1,4 @@
-import type { SoundEffect, SoundCategory, GameSettings } from '@/types';
+import type { SoundEffect, SoundCategory, GameSettings } from "@/types";
 
 // Custom audio node wrapper for advanced audio processing
 interface CustomAudioNode {
@@ -57,15 +57,15 @@ class SoundManager {
     try {
       // Create audio context with browser compatibility
       this.audioContext = new AudioContext();
-      
+
       // Create master gain node
       this.masterGainNode = this.audioContext.createGain();
       this.masterGainNode.connect(this.audioContext.destination);
       this.masterGainNode.gain.value = this.config.masterVolume;
 
       // Create category-specific gain nodes
-      const categories: SoundCategory[] = ['sfx', 'music', 'ambient', 'voice'];
-      categories.forEach(category => {
+      const categories: SoundCategory[] = ["sfx", "music", "ambient", "voice"];
+      categories.forEach((category) => {
         const gainNode = this.audioContext!.createGain();
         gainNode.connect(this.masterGainNode!);
         gainNode.gain.value = this.getCategoryVolume(category);
@@ -74,7 +74,10 @@ class SoundManager {
 
       this.isInitialized = true;
     } catch (error) {
-      console.warn('Web Audio API not supported, falling back to HTML5 audio:', error);
+      console.warn(
+        "Web Audio API not supported, falling back to HTML5 audio:",
+        error,
+      );
       this.isInitialized = true; // Still allow basic functionality
     }
   }
@@ -85,14 +88,19 @@ class SoundManager {
 
     try {
       const audio = new Audio(soundEffect.url);
-      audio.preload = 'auto';
-      audio.volume = this.calculateVolume(soundEffect.category, soundEffect.volume);
+      audio.preload = "auto";
+      audio.volume = this.calculateVolume(
+        soundEffect.category,
+        soundEffect.volume,
+      );
       audio.loop = soundEffect.loop;
-      
+
       // Wait for the audio to be ready
       await new Promise<void>((resolve, reject) => {
-        audio.addEventListener('canplaythrough', () => resolve(), { once: true });
-        audio.addEventListener('error', reject, { once: true });
+        audio.addEventListener("canplaythrough", () => resolve(), {
+          once: true,
+        });
+        audio.addEventListener("error", reject, { once: true });
         audio.load();
       });
 
@@ -104,12 +112,15 @@ class SoundManager {
 
   // Load multiple sounds
   async loadSounds(soundEffects: SoundEffect[]): Promise<void> {
-    const loadPromises = soundEffects.map(sound => this.loadSound(sound));
+    const loadPromises = soundEffects.map((sound) => this.loadSound(sound));
     await Promise.allSettled(loadPromises);
   }
 
   // Enhanced method to create CustomAudioNode for advanced audio processing
-  private createAudioNode(audio: HTMLAudioElement, category: SoundCategory): CustomAudioNode {
+  private createAudioNode(
+    audio: HTMLAudioElement,
+    category: SoundCategory,
+  ): CustomAudioNode {
     const audioNode: CustomAudioNode = {
       audio,
     };
@@ -134,7 +145,7 @@ class SoundManager {
           gainNode.connect(this.masterGainNode!);
         }
       } catch (error) {
-        console.warn('Failed to create Web Audio API nodes:', error);
+        console.warn("Failed to create Web Audio API nodes:", error);
       }
     }
 
@@ -143,14 +154,14 @@ class SoundManager {
 
   // Enhanced playSound method using CustomAudioNode
   async playSound(
-    soundId: string, 
+    soundId: string,
     options: {
       volume?: number;
       loop?: boolean;
       fadeIn?: boolean;
       category?: SoundCategory;
       spatialAudio?: { x: number; y: number; z: number };
-    } = {}
+    } = {},
   ): Promise<string | null> {
     await this.initialize();
 
@@ -163,8 +174,8 @@ class SoundManager {
     // Clone the audio for multiple simultaneous plays
     const audioClone = audio.cloneNode() as HTMLAudioElement;
     const instanceId = `${soundId}_${Date.now()}_${Math.random()}`;
-    const category = options.category || 'sfx';
-    
+    const category = options.category || "sfx";
+
     // Create CustomAudioNode for advanced processing
     const audioNode = this.createAudioNode(audioClone, category);
     this.audioNodes.set(instanceId, audioNode);
@@ -185,18 +196,27 @@ class SoundManager {
     if (options.spatialAudio && this.audioContext && audioNode.source) {
       try {
         const panner = this.audioContext.createPanner();
-        panner.panningModel = 'HRTF';
-        panner.distanceModel = 'inverse';
+        panner.panningModel = "HRTF";
+        panner.distanceModel = "inverse";
         panner.refDistance = 1;
         panner.maxDistance = 10000;
         panner.rolloffFactor = 1;
         panner.coneInnerAngle = 360;
         panner.coneOuterAngle = 0;
         panner.coneOuterGain = 0;
-        
-        panner.positionX.setValueAtTime(options.spatialAudio.x, this.audioContext.currentTime);
-        panner.positionY.setValueAtTime(options.spatialAudio.y, this.audioContext.currentTime);
-        panner.positionZ.setValueAtTime(options.spatialAudio.z, this.audioContext.currentTime);
+
+        panner.positionX.setValueAtTime(
+          options.spatialAudio.x,
+          this.audioContext.currentTime,
+        );
+        panner.positionY.setValueAtTime(
+          options.spatialAudio.y,
+          this.audioContext.currentTime,
+        );
+        panner.positionZ.setValueAtTime(
+          options.spatialAudio.z,
+          this.audioContext.currentTime,
+        );
 
         // Reconnect with panner
         if (audioNode.gainNode) {
@@ -205,7 +225,7 @@ class SoundManager {
           panner.connect(audioNode.gainNode);
         }
       } catch (error) {
-        console.warn('Failed to apply spatial audio:', error);
+        console.warn("Failed to apply spatial audio:", error);
       }
     }
 
@@ -222,7 +242,11 @@ class SoundManager {
     if (options.fadeIn) {
       if (audioNode.gainNode) {
         audioNode.gainNode.gain.value = 0;
-        this.fadeInWithGainNode(audioNode.gainNode, this.config.fadeTime, options.volume || 1);
+        this.fadeInWithGainNode(
+          audioNode.gainNode,
+          this.config.fadeTime,
+          options.volume || 1,
+        );
       } else {
         audioClone.volume = 0;
         this.fadeIn(instance, this.config.fadeTime);
@@ -230,12 +254,12 @@ class SoundManager {
     }
 
     // Clean up when sound ends
-    audioClone.addEventListener('ended', () => {
+    audioClone.addEventListener("ended", () => {
       this.stopSound(instanceId);
     });
 
     this.playingSounds.set(instanceId, instance);
-    
+
     try {
       await audioClone.play();
       return instanceId;
@@ -248,17 +272,24 @@ class SoundManager {
   }
 
   // Enhanced fade methods for Web Audio API
-  private fadeInWithGainNode(gainNode: GainNode, duration: number, targetVolume: number): void {
+  private fadeInWithGainNode(
+    gainNode: GainNode,
+    duration: number,
+    targetVolume: number,
+  ): void {
     if (!this.audioContext) return;
-    
+
     const currentTime = this.audioContext.currentTime;
     gainNode.gain.setValueAtTime(0, currentTime);
-    gainNode.gain.linearRampToValueAtTime(targetVolume, currentTime + duration / 1000);
+    gainNode.gain.linearRampToValueAtTime(
+      targetVolume,
+      currentTime + duration / 1000,
+    );
   }
 
   private fadeOutWithGainNode(gainNode: GainNode, duration: number): void {
     if (!this.audioContext) return;
-    
+
     const currentTime = this.audioContext.currentTime;
     gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
     gainNode.gain.linearRampToValueAtTime(0, currentTime + duration / 1000);
@@ -266,37 +297,37 @@ class SoundManager {
 
   // Method to apply audio effects using CustomAudioNode
   applyAudioEffect(
-    instanceId: string, 
-    effect: 'reverb' | 'delay' | 'distortion' | 'lowpass' | 'highpass',
-    intensity: number = 0.5
+    instanceId: string,
+    effect: "reverb" | "delay" | "distortion" | "lowpass" | "highpass",
+    intensity: number = 0.5,
   ): void {
     const audioNode = this.audioNodes.get(instanceId);
     if (!audioNode?.source || !this.audioContext) return;
 
     try {
       let effectNode: AudioNode;
-      
+
       switch (effect) {
-        case 'lowpass':
+        case "lowpass":
           const lowpass = this.audioContext.createBiquadFilter();
-          lowpass.type = 'lowpass';
+          lowpass.type = "lowpass";
           lowpass.frequency.value = 1000 * (1 - intensity);
           effectNode = lowpass;
           break;
-          
-        case 'highpass':
+
+        case "highpass":
           const highpass = this.audioContext.createBiquadFilter();
-          highpass.type = 'highpass';
+          highpass.type = "highpass";
           highpass.frequency.value = 1000 * intensity;
           effectNode = highpass;
           break;
-          
-        case 'delay':
+
+        case "delay":
           const delay = this.audioContext.createDelay();
           delay.delayTime.value = intensity * 0.5;
           effectNode = delay;
           break;
-          
+
         default:
           return;
       }
@@ -368,18 +399,18 @@ class SoundManager {
 
   setCategoryVolume(category: SoundCategory, volume: number): void {
     const clampedVolume = Math.max(0, Math.min(1, volume));
-    
+
     switch (category) {
-      case 'sfx':
+      case "sfx":
         this.config.sfxVolume = clampedVolume;
         break;
-      case 'music':
+      case "music":
         this.config.musicVolume = clampedVolume;
         break;
-      case 'ambient':
+      case "ambient":
         this.config.ambientVolume = clampedVolume;
         break;
-      case 'voice':
+      case "voice":
         this.config.voiceVolume = clampedVolume;
         break;
     }
@@ -388,7 +419,7 @@ class SoundManager {
     if (gainNode) {
       gainNode.gain.value = clampedVolume;
     }
-    
+
     this.updateCategoryVolumes(category);
   }
 
@@ -410,10 +441,10 @@ class SoundManager {
   // Apply game settings
   applyGameSettings(settings: Partial<GameSettings>): void {
     if (settings.soundVolume !== undefined) {
-      this.setCategoryVolume('sfx', settings.soundVolume);
+      this.setCategoryVolume("sfx", settings.soundVolume);
     }
     if (settings.musicVolume !== undefined) {
-      this.setCategoryVolume('music', settings.musicVolume);
+      this.setCategoryVolume("music", settings.musicVolume);
     }
   }
 
@@ -424,11 +455,16 @@ class SoundManager {
 
   getCategoryVolume(category: SoundCategory): number {
     switch (category) {
-      case 'sfx': return this.config.sfxVolume;
-      case 'music': return this.config.musicVolume;
-      case 'ambient': return this.config.ambientVolume;
-      case 'voice': return this.config.voiceVolume;
-      default: return 1.0;
+      case "sfx":
+        return this.config.sfxVolume;
+      case "music":
+        return this.config.musicVolume;
+      case "ambient":
+        return this.config.ambientVolume;
+      case "voice":
+        return this.config.voiceVolume;
+      default:
+        return 1.0;
     }
   }
 
@@ -446,33 +482,36 @@ class SoundManager {
   }
 
   // Private helper methods
-  private calculateVolume(category: SoundCategory, soundVolume: number): number {
+  private calculateVolume(
+    category: SoundCategory,
+    soundVolume: number,
+  ): number {
     if (this.config.muted) return 0;
-    
+
     const categoryVolume = this.getCategoryVolume(category);
     return this.config.masterVolume * categoryVolume * soundVolume;
   }
 
   private updateAllVolumes(): void {
-    this.playingSounds.forEach(instance => {
-      const originalAudio = this.loadedSounds.get(instance.id.split('_')[0]);
+    this.playingSounds.forEach((instance) => {
+      const originalAudio = this.loadedSounds.get(instance.id.split("_")[0]);
       if (originalAudio) {
         instance.audio.volume = this.calculateVolume(
           instance.category,
-          originalAudio.volume
+          originalAudio.volume,
         );
       }
     });
   }
 
   private updateCategoryVolumes(category: SoundCategory): void {
-    this.playingSounds.forEach(instance => {
+    this.playingSounds.forEach((instance) => {
       if (instance.category === category) {
-        const originalAudio = this.loadedSounds.get(instance.id.split('_')[0]);
+        const originalAudio = this.loadedSounds.get(instance.id.split("_")[0]);
         if (originalAudio) {
           instance.audio.volume = this.calculateVolume(
             category,
-            originalAudio.volume
+            originalAudio.volume,
           );
         }
       }
@@ -489,7 +528,7 @@ class SoundManager {
     instance.fadeInterval = setInterval(() => {
       currentStep++;
       instance.audio.volume = Math.min(targetVolume, volumeStep * currentStep);
-      
+
       if (currentStep >= steps) {
         if (instance.fadeInterval) {
           clearInterval(instance.fadeInterval);
@@ -508,8 +547,11 @@ class SoundManager {
 
     instance.fadeInterval = setInterval(() => {
       currentStep++;
-      instance.audio.volume = Math.max(0, initialVolume - (volumeStep * currentStep));
-      
+      instance.audio.volume = Math.max(
+        0,
+        initialVolume - volumeStep * currentStep,
+      );
+
       if (currentStep >= steps || instance.audio.volume <= 0) {
         instance.audio.pause();
         instance.audio.currentTime = 0;
@@ -523,7 +565,7 @@ class SoundManager {
     if (instance?.fadeInterval) {
       clearInterval(instance.fadeInterval);
     }
-    
+
     // Clean up CustomAudioNode connections
     const audioNode = this.audioNodes.get(instanceId);
     if (audioNode?.source) {
@@ -540,7 +582,7 @@ class SoundManager {
         console.log(error);
       }
     }
-    
+
     this.playingSounds.delete(instanceId);
     this.audioNodes.delete(instanceId);
   }
@@ -550,8 +592,8 @@ class SoundManager {
     this.stopAllSounds();
     this.loadedSounds.clear();
     this.playingSounds.clear();
-    
-    if (this.audioContext && this.audioContext.state !== 'closed') {
+
+    if (this.audioContext && this.audioContext.state !== "closed") {
       this.audioContext.close();
     }
   }
@@ -561,20 +603,21 @@ class SoundManager {
 export const soundManager = new SoundManager();
 
 // Export utility functions
-export const playSound = (soundId: string, options?: Parameters<typeof soundManager.playSound>[1]) => 
-  soundManager.playSound(soundId, options);
+export const playSound = (
+  soundId: string,
+  options?: Parameters<typeof soundManager.playSound>[1],
+) => soundManager.playSound(soundId, options);
 
-export const stopSound = (instanceId: string, fadeOut?: boolean) => 
+export const stopSound = (instanceId: string, fadeOut?: boolean) =>
   soundManager.stopSound(instanceId, fadeOut);
 
-export const setMasterVolume = (volume: number) => 
+export const setMasterVolume = (volume: number) =>
   soundManager.setMasterVolume(volume);
 
-export const setCategoryVolume = (category: SoundCategory, volume: number) => 
+export const setCategoryVolume = (category: SoundCategory, volume: number) =>
   soundManager.setCategoryVolume(category, volume);
 
-export const toggleMute = () => 
-  soundManager.toggleMute();
+export const toggleMute = () => soundManager.toggleMute();
 
 // Preload common game sounds
 export const preloadGameSounds = async (sounds: SoundEffect[]) => {
@@ -585,36 +628,36 @@ export const preloadGameSounds = async (sounds: SoundEffect[]) => {
 // Horror game specific utilities
 export const playHorrorAmbient = async (ambientSoundId: string) => {
   return soundManager.playSound(ambientSoundId, {
-    category: 'ambient',
+    category: "ambient",
     loop: true,
     fadeIn: true,
-    volume: 0.3
+    volume: 0.3,
   });
 };
 
 export const playJumpScare = async (scareSoundId: string) => {
   return soundManager.playSound(scareSoundId, {
-    category: 'sfx',
-    volume: 1.0
+    category: "sfx",
+    volume: 1.0,
   });
 };
 
 export const playFootsteps = async (footstepSoundId: string) => {
   return soundManager.playSound(footstepSoundId, {
-    category: 'sfx',
-    volume: 0.7
+    category: "sfx",
+    volume: 0.7,
   });
 };
 
 export const playBackgroundMusic = async (musicId: string) => {
   // Stop any existing music first
-  soundManager.stopSoundsByCategory('music', true);
-  
+  soundManager.stopSoundsByCategory("music", true);
+
   return soundManager.playSound(musicId, {
-    category: 'music',
+    category: "music",
     loop: true,
     fadeIn: true,
-    volume: 0.6
+    volume: 0.6,
   });
 };
 

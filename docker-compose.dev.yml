@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   haunted-asylum-dev:
@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.dev
       target: development
     ports:
-      - "3001:3000"  # Changed from 3000:3000 to 3001:3000
+      - "3001:3000" # Changed from 3000:3000 to 3001:3000
     environment:
       - NODE_ENV=development
       - PORT=3000

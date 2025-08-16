@@ -1,4 +1,10 @@
-import type { ApiResponse, GameStats, SaveGame, MultiplayerSession, Player } from '@/types';
+import type {
+  ApiResponse,
+  GameStats,
+  SaveGame,
+  MultiplayerSession,
+  Player,
+} from "@/types";
 
 // Enhanced error types
 interface ApiError {
@@ -17,32 +23,33 @@ interface GameEvent {
 }
 
 // Base API configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 const API_TIMEOUT = 10000; // 10 seconds
 
 // Safe localStorage access for SSR compatibility
 const safeLocalStorage = {
   getItem: (key: string): string | null => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return localStorage.getItem(key);
     }
     return null;
   },
   setItem: (key: string, value: string): void => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(key, value);
     }
   },
   removeItem: (key: string): void => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem(key);
     }
-  }
+  },
 };
 
 // Request configuration interface
 interface RequestConfig {
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   url: string;
   data?: unknown;
   headers?: Record<string, string>;
@@ -59,20 +66,26 @@ class ApiClient {
     this.baseURL = baseURL;
     this.timeout = timeout;
     this.defaultHeaders = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
   }
 
   private async request<T>(config: RequestConfig): Promise<ApiResponse<T>> {
-    const { method = 'GET', url, data, headers = {}, timeout = this.timeout } = config;
-    
+    const {
+      method = "GET",
+      url,
+      data,
+      headers = {},
+      timeout = this.timeout,
+    } = config;
+
     // Request interceptor logic
-    const token = safeLocalStorage.getItem('authToken');
+    const token = safeLocalStorage.getItem("authToken");
     const requestHeaders = {
       ...this.defaultHeaders,
       ...headers,
       ...(token && { Authorization: `Bearer ${token}` }),
-      'X-Request-ID': `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      "X-Request-ID": `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
     };
 
     console.log(`[API Request] ${method} ${url}`);
@@ -94,16 +107,16 @@ class ApiClient {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error('[API Response Error]', responseData);
-        
+        console.error("[API Response Error]", responseData);
+
         // Create proper ApiError object
         const apiError: ApiError = {
           message: responseData.message || `HTTP ${response.status}`,
           code: responseData.code,
           status: response.status,
-          details: responseData.details || responseData
+          details: responseData.details || responseData,
         };
-        
+
         return {
           success: false,
           error: apiError.message,
@@ -114,22 +127,22 @@ class ApiClient {
       return {
         success: true,
         data: responseData.data || responseData,
-        message: responseData.message || 'Request successful'
+        message: responseData.message || "Request successful",
       };
     } catch (error: unknown) {
       clearTimeout(timeoutId);
-      
+
       // Create proper ApiError for network/fetch errors
       const fetchError = error as Error;
       const apiError: ApiError = {
-        message: fetchError.message || 'Network error',
-        code: 'NETWORK_ERROR',
+        message: fetchError.message || "Network error",
+        code: "NETWORK_ERROR",
         status: 0,
-        details: { originalError: fetchError.name }
+        details: { originalError: fetchError.name },
       };
-      
-      console.error('[API Request Error]', apiError);
-      
+
+      console.error("[API Request Error]", apiError);
+
       return {
         success: false,
         error: apiError.message,
@@ -139,24 +152,42 @@ class ApiClient {
   }
 
   // HTTP method helpers
-  get<T>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'GET', url, headers });
+  get<T>(
+    url: string,
+    headers?: Record<string, string>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ method: "GET", url, headers });
   }
 
-  post<T>(url: string, data?: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'POST', url, data, headers });
+  post<T>(
+    url: string,
+    data?: unknown,
+    headers?: Record<string, string>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ method: "POST", url, data, headers });
   }
 
-  put<T>(url: string, data?: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'PUT', url, data, headers });
+  put<T>(
+    url: string,
+    data?: unknown,
+    headers?: Record<string, string>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ method: "PUT", url, data, headers });
   }
 
-  patch<T>(url: string, data?: unknown, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'PATCH', url, data, headers });
+  patch<T>(
+    url: string,
+    data?: unknown,
+    headers?: Record<string, string>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ method: "PATCH", url, data, headers });
   }
 
-  delete<T>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>({ method: 'DELETE', url, headers });
+  delete<T>(
+    url: string,
+    headers?: Record<string, string>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ method: "DELETE", url, headers });
   }
 }
 
@@ -165,25 +196,25 @@ const apiClient = new ApiClient(API_BASE_URL, API_TIMEOUT);
 
 // Generic API request function
 export async function apiRequest<T = unknown>(
-  config: RequestConfig
+  config: RequestConfig,
 ): Promise<ApiResponse<T>> {
-  const { method = 'GET', url, data, headers } = config;
-  if (method === 'GET') return apiClient.get<T>(url, headers);
-  if (method === 'POST') return apiClient.post<T>(url, data, headers);
-  if (method === 'PUT') return apiClient.put<T>(url, data, headers);
-  if (method === 'PATCH') return apiClient.patch<T>(url, data, headers);
+  const { method = "GET", url, data, headers } = config;
+  if (method === "GET") return apiClient.get<T>(url, headers);
+  if (method === "POST") return apiClient.post<T>(url, data, headers);
+  if (method === "PUT") return apiClient.put<T>(url, data, headers);
+  if (method === "PATCH") return apiClient.patch<T>(url, data, headers);
   return apiClient.delete<T>(url, headers);
 }
 
 // Enhanced fetch-based alternative (kept for compatibility)
 export async function fetchRequest<T = unknown>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   try {
-    const token = safeLocalStorage.getItem('authToken');
+    const token = safeLocalStorage.getItem("authToken");
     const headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
@@ -202,7 +233,7 @@ export async function fetchRequest<T = unknown>(
     return {
       success: true,
       data,
-      message: data.message || 'Request successful'
+      message: data.message || "Request successful",
     };
   } catch (error: unknown) {
     const fetchError = error as Error;
@@ -219,14 +250,13 @@ export const gameApi = {
   // Player management
   player: {
     create: (playerData: Partial<Player>) =>
-      apiClient.post<Player>('/players', playerData),
-    
-    get: (playerId: string) =>
-      apiClient.get<Player>(`/players/${playerId}`),
-    
+      apiClient.post<Player>("/players", playerData),
+
+    get: (playerId: string) => apiClient.get<Player>(`/players/${playerId}`),
+
     update: (playerId: string, updates: Partial<Player>) =>
       apiClient.patch<Player>(`/players/${playerId}`, updates),
-    
+
     delete: (playerId: string) =>
       apiClient.delete<void>(`/players/${playerId}`),
   },
@@ -235,16 +265,19 @@ export const gameApi = {
   saves: {
     list: (playerId: string) =>
       apiClient.get<SaveGame[]>(`/players/${playerId}/saves`),
-    
-    create: (playerId: string, saveData: Omit<SaveGame, 'id'>) =>
+
+    create: (playerId: string, saveData: Omit<SaveGame, "id">) =>
       apiClient.post<SaveGame>(`/players/${playerId}/saves`, saveData),
-    
+
     get: (playerId: string, saveId: string) =>
       apiClient.get<SaveGame>(`/players/${playerId}/saves/${saveId}`),
-    
+
     update: (playerId: string, saveId: string, updates: Partial<SaveGame>) =>
-      apiClient.patch<SaveGame>(`/players/${playerId}/saves/${saveId}`, updates),
-    
+      apiClient.patch<SaveGame>(
+        `/players/${playerId}/saves/${saveId}`,
+        updates,
+      ),
+
     delete: (playerId: string, saveId: string) =>
       apiClient.delete<void>(`/players/${playerId}/saves/${saveId}`),
   },
@@ -253,30 +286,38 @@ export const gameApi = {
   stats: {
     get: (playerId: string) =>
       apiClient.get<GameStats>(`/players/${playerId}/stats`),
-    
+
     update: (playerId: string, stats: Partial<GameStats>) =>
       apiClient.patch<GameStats>(`/players/${playerId}/stats`, stats),
-    
+
     leaderboard: (limit: number = 10) =>
-      apiClient.get<Array<{ player: Player; stats: GameStats }>>(`/stats/leaderboard?limit=${limit}`),
+      apiClient.get<Array<{ player: Player; stats: GameStats }>>(
+        `/stats/leaderboard?limit=${limit}`,
+      ),
   },
 
   // Multiplayer sessions
   multiplayer: {
-    createSession: (sessionData: Omit<MultiplayerSession, 'id'>) =>
-      apiClient.post<MultiplayerSession>('/multiplayer/sessions', sessionData),
-    
+    createSession: (sessionData: Omit<MultiplayerSession, "id">) =>
+      apiClient.post<MultiplayerSession>("/multiplayer/sessions", sessionData),
+
     joinSession: (sessionId: string, playerId: string) =>
-      apiClient.post<MultiplayerSession>(`/multiplayer/sessions/${sessionId}/join`, { playerId }),
-    
+      apiClient.post<MultiplayerSession>(
+        `/multiplayer/sessions/${sessionId}/join`,
+        { playerId },
+      ),
+
     leaveSession: (sessionId: string, playerId: string) =>
-      apiClient.post<MultiplayerSession>(`/multiplayer/sessions/${sessionId}/leave`, { playerId }),
-    
+      apiClient.post<MultiplayerSession>(
+        `/multiplayer/sessions/${sessionId}/leave`,
+        { playerId },
+      ),
+
     getSession: (sessionId: string) =>
       apiClient.get<MultiplayerSession>(`/multiplayer/sessions/${sessionId}`),
-    
+
     listSessions: () =>
-      apiClient.get<MultiplayerSession[]>('/multiplayer/sessions'),
+      apiClient.get<MultiplayerSession[]>("/multiplayer/sessions"),
   },
 
   // Game events and analytics
@@ -285,9 +326,8 @@ export const gameApi = {
       type: string;
       playerId: string;
       data?: Record<string, unknown>;
-    }) =>
-      apiClient.post<void>('/events/track', eventData),
-    
+    }) => apiClient.post<void>("/events/track", eventData),
+
     getPlayerEvents: (playerId: string, limit: number = 50) =>
       apiClient.get<GameEvent[]>(`/events/player/${playerId}?limit=${limit}`),
   },
@@ -295,20 +335,24 @@ export const gameApi = {
   // Authentication
   auth: {
     login: (credentials: { username: string; password: string }) =>
-      apiClient.post<{ token: string; player: Player }>('/auth/login', credentials),
-    
+      apiClient.post<{ token: string; player: Player }>(
+        "/auth/login",
+        credentials,
+      ),
+
     register: (userData: {
       username: string;
       password: string;
       email: string;
     }) =>
-      apiClient.post<{ token: string; player: Player }>('/auth/register', userData),
-    
-    logout: () =>
-      apiClient.post<void>('/auth/logout'),
-    
-    refreshToken: () =>
-      apiClient.post<{ token: string }>('/auth/refresh'),
+      apiClient.post<{ token: string; player: Player }>(
+        "/auth/register",
+        userData,
+      ),
+
+    logout: () => apiClient.post<void>("/auth/logout"),
+
+    refreshToken: () => apiClient.post<{ token: string }>("/auth/refresh"),
   },
 };
 
@@ -316,49 +360,52 @@ export const gameApi = {
 export const apiUtils = {
   // Set authentication token
   setAuthToken: (token: string): void => {
-    safeLocalStorage.setItem('authToken', token);
+    safeLocalStorage.setItem("authToken", token);
   },
 
   // Clear authentication token
   clearAuthToken: (): void => {
-    safeLocalStorage.removeItem('authToken');
+    safeLocalStorage.removeItem("authToken");
   },
 
   // Get current auth token
   getAuthToken: (): string | null => {
-    return safeLocalStorage.getItem('authToken');
+    return safeLocalStorage.getItem("authToken");
   },
 
   // Check if user is authenticated
   isAuthenticated: (): boolean => {
-    return !!safeLocalStorage.getItem('authToken');
+    return !!safeLocalStorage.getItem("authToken");
   },
 
   // Handle API errors consistently with proper ApiError typing
-  handleApiError: (error: unknown, fallbackMessage = 'An error occurred'): ApiError => {
+  handleApiError: (
+    error: unknown,
+    fallbackMessage = "An error occurred",
+  ): ApiError => {
     // Handle ApiResponse errors
-    if (typeof error === 'object' && error !== null && 'error' in error) {
+    if (typeof error === "object" && error !== null && "error" in error) {
       const apiResponse = error as ApiResponse<unknown>;
       return {
         message: apiResponse.error || fallbackMessage,
-        code: 'API_ERROR'
+        code: "API_ERROR",
       };
     }
-    
+
     // Handle fetch/network errors
     if (error instanceof Error) {
       return {
         message: error.message,
-        code: 'NETWORK_ERROR',
-        details: { name: error.name }
+        code: "NETWORK_ERROR",
+        details: { name: error.name },
       };
     }
-    
+
     // Handle unknown errors
     return {
       message: fallbackMessage,
-      code: 'UNKNOWN_ERROR',
-      details: { originalError: error }
+      code: "UNKNOWN_ERROR",
+      details: { originalError: error },
     };
   },
 
@@ -369,50 +416,52 @@ export const apiUtils = {
 
   // Check if error is a specific type
   isNetworkError: (apiError: ApiError): boolean => {
-    return apiError.code === 'NETWORK_ERROR';
+    return apiError.code === "NETWORK_ERROR";
   },
 
   // Check if error is authentication related
   isAuthError: (apiError: ApiError): boolean => {
-    return apiError.status === 401 || apiError.code === 'AUTH_ERROR';
+    return apiError.status === 401 || apiError.code === "AUTH_ERROR";
   },
 
   // Enhanced retry mechanism with proper ApiError typing
   retryRequest: async <T>(
     requestFn: () => Promise<ApiResponse<T>>,
     maxRetries = 3,
-    delay = 1000
+    delay = 1000,
   ): Promise<ApiResponse<T>> => {
     let lastError: ApiError = {
-      message: 'Unknown error',
-      code: 'UNKNOWN_ERROR'
+      message: "Unknown error",
+      code: "UNKNOWN_ERROR",
     };
-    
+
     for (let i = 0; i <= maxRetries; i++) {
       try {
         const result = await requestFn();
         if (result.success) {
           return result;
         }
-        
+
         // Convert failed response to ApiError
         lastError = {
-          message: result.error || result.message || 'Request failed',
-          code: 'REQUEST_FAILED'
+          message: result.error || result.message || "Request failed",
+          code: "REQUEST_FAILED",
         };
       } catch (error: unknown) {
         lastError = apiUtils.handleApiError(error);
       }
-      
+
       if (i < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, delay * Math.pow(2, i)),
+        );
       }
     }
-    
+
     return {
       success: false,
       error: lastError.message,
-      message: lastError.message
+      message: lastError.message,
     };
   },
 
@@ -421,28 +470,31 @@ export const apiUtils = {
     return {
       success: false,
       error: apiError.message,
-      message: apiError.message
+      message: apiError.message,
     };
   },
 
   // Validate API response structure
   validateResponse: <T>(response: unknown): response is ApiResponse<T> => {
     return (
-      typeof response === 'object' &&
+      typeof response === "object" &&
       response !== null &&
-      'success' in response &&
-      typeof (response as ApiResponse<T>).success === 'boolean'
+      "success" in response &&
+      typeof (response as ApiResponse<T>).success === "boolean"
     );
   },
 
   // Create standardized error response
-  createStandardErrorResponse: <T>(message: string, error?: string): ApiResponse<T> => {
+  createStandardErrorResponse: <T>(
+    message: string,
+    error?: string,
+  ): ApiResponse<T> => {
     return {
       success: false,
       error: error || message,
-      message
+      message,
     };
-  }
+  },
 };
 
 // Export the API client for direct use if needed

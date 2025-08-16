@@ -1,9 +1,15 @@
 // Game State Types
-export type GameState = 'menu' | 'playing' | 'paused' | 'game-over' | 'victory' | 'loading';
+export type GameState =
+  | "menu"
+  | "playing"
+  | "paused"
+  | "game-over"
+  | "victory"
+  | "loading";
 
-export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
+export type Difficulty = "easy" | "medium" | "hard" | "nightmare";
 
-export type GameMode = 'single-player' | 'multiplayer' | 'co-op';
+export type GameMode = "single-player" | "multiplayer" | "co-op";
 
 // Player Types
 export interface Player {
@@ -43,19 +49,19 @@ export interface Room {
   hauntingLevel: number;
 }
 
-export type RoomType = 
-  | 'entrance'
-  | 'corridor'
-  | 'patient-room'
-  | 'operating-room'
-  | 'basement'
-  | 'attic'
-  | 'cafeteria'
-  | 'office'
-  | 'morgue'
-  | 'chapel'
-  | 'garden'
-  | 'laboratory';
+export type RoomType =
+  | "entrance"
+  | "corridor"
+  | "patient-room"
+  | "operating-room"
+  | "basement"
+  | "attic"
+  | "cafeteria"
+  | "office"
+  | "morgue"
+  | "chapel"
+  | "garden"
+  | "laboratory";
 
 export interface Exit {
   direction: Direction;
@@ -64,7 +70,7 @@ export interface Exit {
   requiredKey?: string;
 }
 
-export type Direction = 'north' | 'south' | 'east' | 'west' | 'up' | 'down';
+export type Direction = "north" | "south" | "east" | "west" | "up" | "down";
 
 // Inventory and Items
 export interface InventoryItem {
@@ -78,16 +84,16 @@ export interface InventoryItem {
   effect?: ItemEffect;
 }
 
-export type ItemType = 
-  | 'key'
-  | 'weapon'
-  | 'tool'
-  | 'medicine'
-  | 'document'
-  | 'artifact'
-  | 'food'
-  | 'light-source'
-  | 'protective-gear';
+export type ItemType =
+  | "key"
+  | "weapon"
+  | "tool"
+  | "medicine"
+  | "document"
+  | "artifact"
+  | "food"
+  | "light-source"
+  | "protective-gear";
 
 export interface ItemEffect {
   healthRestore?: number;
@@ -111,15 +117,15 @@ export interface Enemy {
   description: string;
 }
 
-export type EnemyType = 
-  | 'ghost'
-  | 'shadow'
-  | 'possessed-patient'
-  | 'demon'
-  | 'poltergeist'
-  | 'wraith'
-  | 'nightmare'
-  | 'cursed-doctor';
+export type EnemyType =
+  | "ghost"
+  | "shadow"
+  | "possessed-patient"
+  | "demon"
+  | "poltergeist"
+  | "wraith"
+  | "nightmare"
+  | "cursed-doctor";
 
 // Game Events and Actions
 export interface GameEvent {
@@ -132,34 +138,34 @@ export interface GameEvent {
   data?: Record<string, string | number | boolean | object>;
 }
 
-export type EventType = 
-  | 'player-move'
-  | 'item-pickup'
-  | 'item-use'
-  | 'enemy-encounter'
-  | 'door-unlock'
-  | 'health-change'
-  | 'sanity-change'
-  | 'game-save'
-  | 'game-load'
-  | 'puzzle-solve'
-  | 'story-trigger';
+export type EventType =
+  | "player-move"
+  | "item-pickup"
+  | "item-use"
+  | "enemy-encounter"
+  | "door-unlock"
+  | "health-change"
+  | "sanity-change"
+  | "game-save"
+  | "game-load"
+  | "puzzle-solve"
+  | "story-trigger";
 
 export interface Action {
   type: ActionType;
   payload?: Record<string, unknown>;
 }
 
-export type ActionType = 
-  | 'MOVE_PLAYER'
-  | 'USE_ITEM'
-  | 'PICKUP_ITEM'
-  | 'ATTACK_ENEMY'
-  | 'OPEN_DOOR'
-  | 'EXAMINE_OBJECT'
-  | 'SAVE_GAME'
-  | 'LOAD_GAME'
-  | 'CHANGE_SETTINGS';
+export type ActionType =
+  | "MOVE_PLAYER"
+  | "USE_ITEM"
+  | "PICKUP_ITEM"
+  | "ATTACK_ENEMY"
+  | "OPEN_DOOR"
+  | "EXAMINE_OBJECT"
+  | "SAVE_GAME"
+  | "LOAD_GAME"
+  | "CHANGE_SETTINGS";
 
 // Game Settings and Configuration
 export interface GameSettings {
@@ -172,7 +178,7 @@ export interface GameSettings {
   controlScheme: ControlScheme;
 }
 
-export type ControlScheme = 'wasd' | 'arrow-keys' | 'custom';
+export type ControlScheme = "wasd" | "arrow-keys" | "custom";
 
 // Save Game Data
 export interface SaveGame {
@@ -193,7 +199,7 @@ export interface SaveGame {
 export interface DialogueOption {
   id: string;
   text: string;
-  action?: Action;
+  action?: () => void;
   condition?: (gameState: GameState) => boolean;
 }
 
@@ -214,7 +220,12 @@ export interface Notification {
   timestamp: number;
 }
 
-export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'story';
+export type NotificationType =
+  | "info"
+  | "warning"
+  | "error"
+  | "success"
+  | "story";
 
 // Audio and Visual Effects
 export interface SoundEffect {
@@ -226,7 +237,7 @@ export interface SoundEffect {
   category: SoundCategory;
 }
 
-export type SoundCategory = 'sfx' | 'music' | 'ambient' | 'voice';
+export type SoundCategory = "sfx" | "music" | "ambient" | "voice";
 
 export interface VisualEffect {
   id: string;
@@ -236,7 +247,7 @@ export interface VisualEffect {
   color?: string;
 }
 
-export type EffectType = 'flash' | 'shake' | 'fade' | 'blur' | 'distortion';
+export type EffectType = "flash" | "shake" | "fade" | "blur" | "distortion";
 
 // Puzzle and Interaction Types
 export interface Puzzle {
@@ -250,13 +261,13 @@ export interface Puzzle {
   reward?: InventoryItem;
 }
 
-export type PuzzleType = 
-  | 'combination-lock'
-  | 'key-sequence'
-  | 'pattern-matching'
-  | 'riddle'
-  | 'memory-game'
-  | 'logic-puzzle';
+export type PuzzleType =
+  | "combination-lock"
+  | "key-sequence"
+  | "pattern-matching"
+  | "riddle"
+  | "memory-game"
+  | "logic-puzzle";
 
 // Story and Narrative
 export interface StoryNode {
@@ -287,7 +298,12 @@ export interface MultiplayerSession {
   status: SessionStatus;
 }
 
-export type SessionStatus = 'waiting' | 'starting' | 'in-progress' | 'paused' | 'ended';
+export type SessionStatus =
+  | "waiting"
+  | "starting"
+  | "in-progress"
+  | "paused"
+  | "ended";
 
 // API Response Types
 export interface ApiResponse<T = unknown> {
@@ -314,7 +330,9 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
-export type GameComponent<Props extends Record<string, unknown> = Record<string, never>> = React.ComponentType<Props>;
+export type GameComponent<
+  Props extends Record<string, unknown> = Record<string, never>,
+> = React.ComponentType<Props>;
 
 export type EventHandler<T = unknown> = (event: T) => void;
 

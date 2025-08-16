@@ -13,8 +13,8 @@ import type {
   Notification,
   Puzzle,
   StoryNode,
-  MultiplayerSession
-} from './index';
+  MultiplayerSession,
+} from "./index";
 
 // Base Action Interface
 export interface BaseAction {
@@ -25,14 +25,14 @@ export interface BaseAction {
 
 // Game State Actions
 export interface SetGameStateAction extends BaseAction {
-  type: 'SET_GAME_STATE';
+  type: "SET_GAME_STATE";
   payload: {
     state: GameState;
   };
 }
 
 export interface InitializeGameAction extends BaseAction {
-  type: 'INITIALIZE_GAME';
+  type: "INITIALIZE_GAME";
   payload: {
     player: Player;
     startingRoomId: string;
@@ -41,17 +41,17 @@ export interface InitializeGameAction extends BaseAction {
 }
 
 export interface PauseGameAction extends BaseAction {
-  type: 'PAUSE_GAME';
+  type: "PAUSE_GAME";
 }
 
 export interface ResumeGameAction extends BaseAction {
-  type: 'RESUME_GAME';
+  type: "RESUME_GAME";
 }
 
 export interface EndGameAction extends BaseAction {
-  type: 'END_GAME';
+  type: "END_GAME";
   payload: {
-    reason: 'victory' | 'defeat' | 'quit';
+    reason: "victory" | "defeat" | "quit";
     finalStats?: {
       score: number;
       timeElapsed: number;
@@ -66,7 +66,7 @@ export interface EndGameAction extends BaseAction {
 
 // Player Actions
 export interface MovePlayerAction extends BaseAction {
-  type: 'MOVE_PLAYER';
+  type: "MOVE_PLAYER";
   payload: {
     newPosition: Position;
     fromRoomId: string;
@@ -75,7 +75,7 @@ export interface MovePlayerAction extends BaseAction {
 }
 
 export interface UpdatePlayerHealthAction extends BaseAction {
-  type: 'UPDATE_PLAYER_HEALTH';
+  type: "UPDATE_PLAYER_HEALTH";
   payload: {
     healthChange: number;
     reason?: string;
@@ -83,7 +83,7 @@ export interface UpdatePlayerHealthAction extends BaseAction {
 }
 
 export interface UpdatePlayerSanityAction extends BaseAction {
-  type: 'UPDATE_PLAYER_SANITY';
+  type: "UPDATE_PLAYER_SANITY";
   payload: {
     sanityChange: number;
     reason?: string;
@@ -91,7 +91,7 @@ export interface UpdatePlayerSanityAction extends BaseAction {
 }
 
 export interface LevelUpPlayerAction extends BaseAction {
-  type: 'LEVEL_UP_PLAYER';
+  type: "LEVEL_UP_PLAYER";
   payload: {
     newLevel: number;
     experienceGained: number;
@@ -99,14 +99,14 @@ export interface LevelUpPlayerAction extends BaseAction {
 }
 
 export interface KillPlayerAction extends BaseAction {
-  type: 'KILL_PLAYER';
+  type: "KILL_PLAYER";
   payload: {
     cause: string;
   };
 }
 
 export interface RevivePlayerAction extends BaseAction {
-  type: 'REVIVE_PLAYER';
+  type: "REVIVE_PLAYER";
   payload: {
     respawnRoomId: string;
     healthPercentage?: number;
@@ -115,7 +115,7 @@ export interface RevivePlayerAction extends BaseAction {
 
 // Inventory Actions
 export interface AddItemAction extends BaseAction {
-  type: 'ADD_ITEM';
+  type: "ADD_ITEM";
   payload: {
     item: InventoryItem;
     roomId?: string;
@@ -123,7 +123,7 @@ export interface AddItemAction extends BaseAction {
 }
 
 export interface RemoveItemAction extends BaseAction {
-  type: 'REMOVE_ITEM';
+  type: "REMOVE_ITEM";
   payload: {
     itemId: string;
     quantity?: number;
@@ -131,16 +131,16 @@ export interface RemoveItemAction extends BaseAction {
 }
 
 export interface UseItemAction extends BaseAction {
-  type: 'USE_ITEM';
+  type: "USE_ITEM";
   payload: {
     itemId: string;
     targetId?: string;
-    targetType?: 'player' | 'enemy' | 'object' | 'door';
+    targetType?: "player" | "enemy" | "object" | "door";
   };
 }
 
 export interface DropItemAction extends BaseAction {
-  type: 'DROP_ITEM';
+  type: "DROP_ITEM";
   payload: {
     itemId: string;
     quantity: number;
@@ -150,7 +150,7 @@ export interface DropItemAction extends BaseAction {
 
 // Room and Environment Actions
 export interface EnterRoomAction extends BaseAction {
-  type: 'ENTER_ROOM';
+  type: "ENTER_ROOM";
   payload: {
     roomId: string;
     previousRoomId?: string;
@@ -158,7 +158,7 @@ export interface EnterRoomAction extends BaseAction {
 }
 
 export interface UpdateRoomAction extends BaseAction {
-  type: 'UPDATE_ROOM';
+  type: "UPDATE_ROOM";
   payload: {
     roomId: string;
     updates: Partial<Room>;
@@ -166,7 +166,7 @@ export interface UpdateRoomAction extends BaseAction {
 }
 
 export interface UnlockDoorAction extends BaseAction {
-  type: 'UNLOCK_DOOR';
+  type: "UNLOCK_DOOR";
   payload: {
     roomId: string;
     direction: string;
@@ -175,7 +175,7 @@ export interface UnlockDoorAction extends BaseAction {
 }
 
 export interface ToggleLightAction extends BaseAction {
-  type: 'TOGGLE_LIGHT';
+  type: "TOGGLE_LIGHT";
   payload: {
     roomId: string;
     lightLevel: number;
@@ -184,7 +184,7 @@ export interface ToggleLightAction extends BaseAction {
 
 // Enemy Actions
 export interface SpawnEnemyAction extends BaseAction {
-  type: 'SPAWN_ENEMY';
+  type: "SPAWN_ENEMY";
   payload: {
     enemy: Enemy;
     roomId: string;
@@ -192,7 +192,7 @@ export interface SpawnEnemyAction extends BaseAction {
 }
 
 export interface MoveEnemyAction extends BaseAction {
-  type: 'MOVE_ENEMY';
+  type: "MOVE_ENEMY";
   payload: {
     enemyId: string;
     newPosition: Position;
@@ -201,7 +201,7 @@ export interface MoveEnemyAction extends BaseAction {
 }
 
 export interface AttackEnemyAction extends BaseAction {
-  type: 'ATTACK_ENEMY';
+  type: "ATTACK_ENEMY";
   payload: {
     enemyId: string;
     damage: number;
@@ -210,7 +210,7 @@ export interface AttackEnemyAction extends BaseAction {
 }
 
 export interface DefeatEnemyAction extends BaseAction {
-  type: 'DEFEAT_ENEMY';
+  type: "DEFEAT_ENEMY";
   payload: {
     enemyId: string;
     experienceGained: number;
@@ -219,7 +219,7 @@ export interface DefeatEnemyAction extends BaseAction {
 }
 
 export interface EnemyAttackPlayerAction extends BaseAction {
-  type: 'ENEMY_ATTACK_PLAYER';
+  type: "ENEMY_ATTACK_PLAYER";
   payload: {
     enemyId: string;
     damage: number;
@@ -229,14 +229,14 @@ export interface EnemyAttackPlayerAction extends BaseAction {
 
 // Puzzle Actions
 export interface StartPuzzleAction extends BaseAction {
-  type: 'START_PUZZLE';
+  type: "START_PUZZLE";
   payload: {
     puzzle: Puzzle;
   };
 }
 
 export interface SolvePuzzleAction extends BaseAction {
-  type: 'SOLVE_PUZZLE';
+  type: "SOLVE_PUZZLE";
   payload: {
     puzzleId: string;
     solution: string | number | boolean | Record<string, unknown>;
@@ -245,7 +245,7 @@ export interface SolvePuzzleAction extends BaseAction {
 }
 
 export interface FailPuzzleAction extends BaseAction {
-  type: 'FAIL_PUZZLE';
+  type: "FAIL_PUZZLE";
   payload: {
     puzzleId: string;
     attemptsRemaining?: number;
@@ -254,14 +254,14 @@ export interface FailPuzzleAction extends BaseAction {
 
 // Story and Dialogue Actions
 export interface StartDialogueAction extends BaseAction {
-  type: 'START_DIALOGUE';
+  type: "START_DIALOGUE";
   payload: {
     dialogue: Dialogue;
   };
 }
 
 export interface ChooseDialogueOptionAction extends BaseAction {
-  type: 'CHOOSE_DIALOGUE_OPTION';
+  type: "CHOOSE_DIALOGUE_OPTION";
   payload: {
     optionId: string;
     nextDialogueId?: string;
@@ -269,11 +269,11 @@ export interface ChooseDialogueOptionAction extends BaseAction {
 }
 
 export interface EndDialogueAction extends BaseAction {
-  type: 'END_DIALOGUE';
+  type: "END_DIALOGUE";
 }
 
 export interface TriggerStoryEventAction extends BaseAction {
-  type: 'TRIGGER_STORY_EVENT';
+  type: "TRIGGER_STORY_EVENT";
   payload: {
     storyNode: StoryNode;
   };
@@ -281,45 +281,45 @@ export interface TriggerStoryEventAction extends BaseAction {
 
 // UI and Notification Actions
 export interface ShowNotificationAction extends BaseAction {
-  type: 'SHOW_NOTIFICATION';
+  type: "SHOW_NOTIFICATION";
   payload: {
     notification: Notification;
   };
 }
 
 export interface HideNotificationAction extends BaseAction {
-  type: 'HIDE_NOTIFICATION';
+  type: "HIDE_NOTIFICATION";
   payload: {
     notificationId: string;
   };
 }
 
 export interface OpenMenuAction extends BaseAction {
-  type: 'OPEN_MENU';
+  type: "OPEN_MENU";
   payload: {
-    menuType: 'main' | 'inventory' | 'settings' | 'save' | 'load';
+    menuType: "main" | "inventory" | "settings" | "save" | "load";
   };
 }
 
 export interface CloseMenuAction extends BaseAction {
-  type: 'CLOSE_MENU';
+  type: "CLOSE_MENU";
 }
 
 // Settings Actions
 export interface UpdateSettingsAction extends BaseAction {
-  type: 'UPDATE_SETTINGS';
+  type: "UPDATE_SETTINGS";
   payload: {
     settings: Partial<GameSettings>;
   };
 }
 
 export interface ResetSettingsAction extends BaseAction {
-  type: 'RESET_SETTINGS';
+  type: "RESET_SETTINGS";
 }
 
 // Save/Load Actions
 export interface SaveGameAction extends BaseAction {
-  type: 'SAVE_GAME';
+  type: "SAVE_GAME";
   payload: {
     saveSlot: number;
     saveName?: string;
@@ -327,14 +327,14 @@ export interface SaveGameAction extends BaseAction {
 }
 
 export interface LoadGameAction extends BaseAction {
-  type: 'LOAD_GAME';
+  type: "LOAD_GAME";
   payload: {
     saveGame: SaveGame;
   };
 }
 
 export interface DeleteSaveAction extends BaseAction {
-  type: 'DELETE_SAVE';
+  type: "DELETE_SAVE";
   payload: {
     saveId: string;
   };
@@ -342,7 +342,7 @@ export interface DeleteSaveAction extends BaseAction {
 
 // Audio Actions
 export interface PlaySoundAction extends BaseAction {
-  type: 'PLAY_SOUND';
+  type: "PLAY_SOUND";
   payload: {
     soundId: string;
     volume?: number;
@@ -351,14 +351,14 @@ export interface PlaySoundAction extends BaseAction {
 }
 
 export interface StopSoundAction extends BaseAction {
-  type: 'STOP_SOUND';
+  type: "STOP_SOUND";
   payload: {
     soundId: string;
   };
 }
 
 export interface SetMasterVolumeAction extends BaseAction {
-  type: 'SET_MASTER_VOLUME';
+  type: "SET_MASTER_VOLUME";
   payload: {
     volume: number;
   };
@@ -366,14 +366,14 @@ export interface SetMasterVolumeAction extends BaseAction {
 
 // Multiplayer Actions
 export interface CreateSessionAction extends BaseAction {
-  type: 'CREATE_SESSION';
+  type: "CREATE_SESSION";
   payload: {
     session: MultiplayerSession;
   };
 }
 
 export interface JoinSessionAction extends BaseAction {
-  type: 'JOIN_SESSION';
+  type: "JOIN_SESSION";
   payload: {
     sessionId: string;
     player: Player;
@@ -381,7 +381,7 @@ export interface JoinSessionAction extends BaseAction {
 }
 
 export interface LeaveSessionAction extends BaseAction {
-  type: 'LEAVE_SESSION';
+  type: "LEAVE_SESSION";
   payload: {
     sessionId: string;
     playerId: string;
@@ -389,7 +389,7 @@ export interface LeaveSessionAction extends BaseAction {
 }
 
 export interface SyncGameStateAction extends BaseAction {
-  type: 'SYNC_GAME_STATE';
+  type: "SYNC_GAME_STATE";
   payload: {
     gameState: GameState;
     timestamp: number;
@@ -398,7 +398,7 @@ export interface SyncGameStateAction extends BaseAction {
 
 // Error Actions
 export interface GameErrorAction extends BaseAction {
-  type: 'GAME_ERROR';
+  type: "GAME_ERROR";
   payload: {
     error: string;
     code?: string;
@@ -407,23 +407,23 @@ export interface GameErrorAction extends BaseAction {
 }
 
 export interface ClearErrorAction extends BaseAction {
-  type: 'CLEAR_ERROR';
+  type: "CLEAR_ERROR";
 }
 
 // Analytics Actions
 export interface TrackEventAction extends BaseAction {
-  type: 'TRACK_EVENT';
+  type: "TRACK_EVENT";
   payload: {
     event: GameEvent;
   };
 }
 
 export interface UpdateStatsAction extends BaseAction {
-  type: 'UPDATE_STATS';
+  type: "UPDATE_STATS";
   payload: {
     statType: string;
     value: number;
-    operation: 'set' | 'increment' | 'decrement';
+    operation: "set" | "increment" | "decrement";
   };
 }
 
@@ -503,22 +503,21 @@ export type ActionCreator<T extends GameAction> = (
 // Async Action Type (for Redux Thunk)
 export type AsyncAction = (
   dispatch: (action: GameAction) => void,
-  getState: () => GameState
+  getState: () => GameState,
 ) => Promise<void> | void;
 
 // Action Creator Helpers
-export const createAction = <T extends GameAction>(
-  type: T['type']
-) => {
-  return (payload?: T extends { payload: unknown } ? T['payload'] : never): T => ({
-    type,
-    payload,
-    timestamp: Date.now(),
-  } as T);
+export const createAction = <T extends GameAction>(type: T["type"]) => {
+  return (payload?: T extends { payload: unknown } ? T["payload"] : never): T =>
+    ({
+      type,
+      payload,
+      timestamp: Date.now(),
+    }) as T;
 };
 
 export const createAsyncAction = <T extends GameAction>(
-  actionCreator: ActionCreator<T>
+  actionCreator: ActionCreator<T>,
 ) => {
   return (...args: Parameters<typeof actionCreator>): AsyncAction => {
     return async (dispatch) => {
@@ -527,9 +526,9 @@ export const createAsyncAction = <T extends GameAction>(
         dispatch(action);
       } catch (error) {
         dispatch({
-          type: 'GAME_ERROR',
+          type: "GAME_ERROR",
           payload: {
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? error.message : "Unknown error",
             recoverable: true,
           },
           timestamp: Date.now(),
