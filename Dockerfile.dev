@@ -1,0 +1,28 @@
+FROM node:18-alpine AS base
+
+# Install dependencies for better performance
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Development stage
+FROM base AS development
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies with cache mount for faster rebuilds
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
+
+# Copy source code
+COPY . .
+
+EXPOSE 3000
+
+# Enable file watching for hot reload
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Run in development mode with turbopack for faster builds
+CMD ["npm", "run", "dev"]

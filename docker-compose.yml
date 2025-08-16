@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  haunted-asylum:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    restart: unless-stopped
+    container_name: haunted-asylum-app
+    networks:
+      - haunted-asylum-network
+
+networks:
+  haunted-asylum-network:
+    driver: bridge
